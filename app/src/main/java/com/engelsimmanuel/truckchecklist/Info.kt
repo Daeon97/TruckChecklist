@@ -2,12 +2,17 @@ package com.engelsimmanuel.truckchecklist
 
 import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
+import androidx.room.Entity
+import java.sql.Timestamp
 
+// data entity class to specify individual data that will be stored
+@Entity(tableName = "info_table")
 data class Info(
     @PrimaryKey(autoGenerate = true) val uid: Int,
+    @ColumnInfo(name = "timestamp") val timestamp: Timestamp,
 
     // vehicle, driver and truck boy info
-    @ColumnInfo(name = "reg_number") val regNumber: String,
+    @ColumnInfo(name = "registration_number") val registrationNumber: String,
     @ColumnInfo(name = "identification_number") val identificationNumber: String,
     @ColumnInfo(name = "model") val model: String,
     @ColumnInfo(name = "year") val year: Int,
@@ -99,5 +104,5 @@ data class Info(
     @ColumnInfo(name = "wheel_spanner_comment") val wheelSpannerComment: String?,
 
     @ColumnInfo(name = "wedge") val wedge: Boolean,
-    @ColumnInfo(name = "wedge_comment") val wedgeComment: String?,
+    @ColumnInfo(name = "wedge_comment") val wedgeComment: String?
 )
