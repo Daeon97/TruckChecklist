@@ -1,10 +1,12 @@
-package com.engelsimmanuel.truckchecklist;
+package com.engelsimmanuel.truckchecklist.mvvm.arch;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+
+import com.engelsimmanuel.truckchecklist.database.utils.Info;
 
 import java.util.List;
 

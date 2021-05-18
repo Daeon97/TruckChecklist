@@ -10,16 +10,35 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TruckChecklist">
         <activity
-            android:name=".MainActivity"
+            android:name=".screens.OnboardingActivity"
+            android:exported="true"
+            android:label="@string/title_activity_onboarding"
+            android:theme="@style/Theme.TruckChecklist.NoActionBar" />
+        <activity
+            android:name=".screens.AuthActivity"
+            android:exported="true"
+            android:label="@string/title_activity_auth"
+            android:theme="@style/Theme.TruckChecklist.NoActionBar" />
+        <activity
+            android:name=".screens.DashboardActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.TruckChecklist.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".screens.ChecklistActivity"
+            android:exported="true"
+            android:label="@string/title_activity_checklist"
+            android:theme="@style/Theme.TruckChecklist.NoActionBar" />
+        <activity
+            android:name=".screens.ChecklistSubmittedActivity"
+            android:exported="true"
+            android:label="@string/title_activity_checklist_submitted"
+            android:theme="@style/Theme.TruckChecklist.NoActionBar" />
     </application>
 
 </manifest>

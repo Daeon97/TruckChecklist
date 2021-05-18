@@ -1,4 +1,4 @@
-package com.engelsimmanuel.truckchecklist
+package com.engelsimmanuel.truckchecklist.database.utils
 
 import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo

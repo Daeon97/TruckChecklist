@@ -1,4 +1,4 @@
-package com.engelsimmanuel.truckchecklist;
+package com.engelsimmanuel.truckchecklist.database.utils;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;

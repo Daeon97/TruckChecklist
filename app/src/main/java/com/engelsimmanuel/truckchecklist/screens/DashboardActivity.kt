@@ -1,4 +1,4 @@
-package com.engelsimmanuel.truckchecklist
+package com.engelsimmanuel.truckchecklist.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.engelsimmanuel.truckchecklist.ui.theme.TruckChecklistTheme
 
-class MainActivity : ComponentActivity() {
+class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
