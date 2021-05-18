@@ -5,7 +5,12 @@
       <map>
         <entry key="../../../../layout/compose-model-1621249056165.xml" value="0.25" />
         <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/arrowdropup.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/interiorcheck.xml" value="0.15185185185185185" />
         <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/regnumber.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/safetycheck.xml" value="0.15185185185185185" />
+        <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/truckboy.xml" value="0.15185185185185185" />
+        <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/vehicleinformation.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/windows/StudioProjects/TruckChecklist/app/src/main/res/drawable/warninglampscontrol.xml" value="0.15" />
       </map>
     </option>
   </component>
