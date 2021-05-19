@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModelProvider
 import com.engelsimmanuel.truckchecklist.R
 import com.engelsimmanuel.truckchecklist.database.utils.Info
@@ -314,7 +315,7 @@ fun ChecklistScreen(infoViewModel: InfoViewModel, activity: Activity) {
         ) {
             Row(
                 modifier = Modifier
-                .fillMaxWidth()
+                    .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -340,7 +341,7 @@ fun ChecklistScreen(infoViewModel: InfoViewModel, activity: Activity) {
             Column(
                 Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                     .verticalScroll(state = scrollState)
             ) {
                 Image(
