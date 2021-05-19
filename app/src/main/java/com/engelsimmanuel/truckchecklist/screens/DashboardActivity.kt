@@ -1,5 +1,6 @@
 package com.engelsimmanuel.truckchecklist.screens
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -58,10 +59,11 @@ class DashboardActivity : ComponentActivity() {
         infoViewModel.allInfo.observe(
             this, {
                 infoList.addAll(it)
+                Log.wtf("info list", "info list is ${infoList.size}")
             }
         )
         setContent {
-            DashboardScreen(infoList = infoList)
+            DashboardScreen(infoList = infoList, activity = this)
         }
     }
 }
@@ -72,19 +74,13 @@ class DashboardActivity : ComponentActivity() {
 @Composable
 fun DashboardScreenPreview() {
     TruckChecklistTheme {
-        Text("Hello World")
+        Text("Hello world. My name is Engels")
     }
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun DashboardScreen(infoList: ArrayList<Info>, context: Context = LocalContext.current) {
-    /*var infoListIsEmpty by remember {
-        mutableStateOf(true)
-    }
-    SideEffect {
-        infoListIsEmpty = infoList.isEmpty()
-    }*/
+fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
     val scaffoldState = rememberScaffoldState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -104,10 +100,11 @@ fun DashboardScreen(infoList: ArrayList<Info>, context: Context = LocalContext.c
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            context.startActivity(Intent(context, ChecklistActivity::class.java))
+                            activity.startActivity(Intent(activity, ChecklistActivity::class.java))
                             coroutineScope.launch {
                                 modalBottomSheetState.hide()
                             }
+                            activity.finish()
                         }, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(

@@ -8,7 +8,7 @@ import java.sql.Timestamp
 // data entity class to specify individual data that will be stored
 @Entity(tableName = "info_table")
 data class Info(
-    @PrimaryKey(autoGenerate = true) val uid: Int,
+    @PrimaryKey val uid: String,
     @ColumnInfo(name = "timestamp") val timestamp: String,
 
     // vehicle, driver and truck boy info
@@ -36,8 +36,8 @@ data class Info(
     @ColumnInfo(name = "doors_mirror_horn") val doorsMirrorHorn: Boolean,
     @ColumnInfo(name = "doors_mirror_horn_comment") val doorsMirrorHornComment: String?,
 
-    @ColumnInfo(name = "hand_brake_level") val handBrakeLevel: Boolean,
-    @ColumnInfo(name = "hand_brake_level_comment") val handBrakeLevelComment: String?,
+    @ColumnInfo(name = "hand_braker_level") val handBrakerLevel: Boolean,
+    @ColumnInfo(name = "hand_braker_level_comment") val handBrakerLevelComment: String?,
 
     @ColumnInfo(name = "speedometer") val speedometer: Boolean,
     @ColumnInfo(name = "speedometer_comment") val speedometerComment: String?,
