@@ -50,6 +50,7 @@ class ChecklistActivity : ComponentActivity() {
 
     override fun onBackPressed() {
         startActivity(Intent(this, DashboardActivity::class.java))
+        finish()
     }
 }
 

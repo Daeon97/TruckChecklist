@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.engelsimmanuel.truckchecklist.R
+import com.engelsimmanuel.truckchecklist.sharedprefs.SharedPrefsManager
 import com.engelsimmanuel.truckchecklist.ui.theme.TruckChecklistTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,7 +35,14 @@ class AuthActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        // check shared preferences here
+        if (SharedPrefsManager.getInstance(this).isLoggedIn) {
+            startActivity(Intent(this, DashboardActivity::class.java))
+            finish()
+        }
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 }
 
@@ -140,6 +147,7 @@ fun AuthScreen(activity: Activity) {
                             setShowDialog = true
                             delay(3000)
                             setShowDialog = false
+                            SharedPrefsManager.getInstance(activity).isLoggedIn = true
                             activity.startActivity(Intent(activity, DashboardActivity::class.java))
                             activity.finish()
                         }

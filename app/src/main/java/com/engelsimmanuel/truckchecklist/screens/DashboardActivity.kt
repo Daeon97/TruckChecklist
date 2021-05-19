@@ -1,21 +1,17 @@
 package com.engelsimmanuel.truckchecklist.screens
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.PopupMenu
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,18 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.engelsimmanuel.truckchecklist.R
 import com.engelsimmanuel.truckchecklist.database.utils.Info
 import com.engelsimmanuel.truckchecklist.mvvm.arch.InfoViewModel
+import com.engelsimmanuel.truckchecklist.sharedprefs.SharedPrefsManager
 import com.engelsimmanuel.truckchecklist.ui.theme.TruckChecklistTheme
 import kotlinx.coroutines.launch
 
@@ -65,6 +58,10 @@ class DashboardActivity : ComponentActivity() {
         setContent {
             DashboardScreen(infoList = infoList, activity = this)
         }
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 }
 
@@ -264,6 +261,13 @@ fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
                                 dropdownMenus.forEachIndexed { dropdownIndex, dropdownMenu ->
                                     DropdownMenuItem(onClick = {
                                         dropdownShown = !dropdownShown
+                                        if(dropdownIndex == 0){
+                                            //.
+                                        } else {
+                                            SharedPrefsManager.getInstance(activity).isLoggedIn = false
+                                            activity.startActivity(Intent(activity, AuthActivity::class.java))
+                                            activity.finish()
+                                        }
                                     }) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Icon(
