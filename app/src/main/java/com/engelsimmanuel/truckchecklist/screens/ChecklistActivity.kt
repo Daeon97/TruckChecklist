@@ -1606,5 +1606,5 @@ private fun addChecklistToDatabase(
     wedgeChecked: Boolean, wedgeComment: String
 ) {
     // add driver name and timestamp
-    Log.wtf("addChecklistToDatabase", "addChecklistToDatabase was called")
+
 }

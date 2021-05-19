@@ -9,7 +9,7 @@ import java.sql.Timestamp
 @Entity(tableName = "info_table")
 data class Info(
     @PrimaryKey(autoGenerate = true) val uid: Int,
-    @ColumnInfo(name = "timestamp") val timestamp: Timestamp,
+    @ColumnInfo(name = "timestamp") val timestamp: String,
 
     // vehicle, driver and truck boy info
     @ColumnInfo(name = "registration_number") val registrationNumber: String,

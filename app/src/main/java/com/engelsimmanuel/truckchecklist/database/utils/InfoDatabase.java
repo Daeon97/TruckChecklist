@@ -19,7 +19,9 @@ public abstract class InfoDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     InfoDatabase.class,
                     "info_database"
-            ).build();
+            )
+                    .fallbackToDestructiveMigration()
+                    .build();
         }
         return instance;
     }
