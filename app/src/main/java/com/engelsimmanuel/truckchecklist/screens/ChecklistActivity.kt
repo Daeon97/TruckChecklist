@@ -311,22 +311,29 @@ fun ChecklistScreen(infoViewModel: InfoViewModel, activity: Activity) {
             Modifier
                 .fillMaxSize()
         ) {
-            Button(
-                modifier = Modifier.padding(
-                    top = 16.dp,
-                    start = 16.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(android.R.color.white)
-                ),
-                onClick = {
-                    activity.startActivity(Intent(activity, DashboardActivity::class.java))
-                    activity.finish()
-                }
+            Row(
+                modifier = Modifier
+                .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.back),
-                    contentDescription = "back button"
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(android.R.color.white)
+                    ),
+                    onClick = {
+                        activity.startActivity(Intent(activity, DashboardActivity::class.java))
+                        activity.finish()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.back),
+                        contentDescription = "back button"
+                    )
+                }
+                Text(
+                    text = "New vehicle check",
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
             Column(
@@ -335,6 +342,16 @@ fun ChecklistScreen(infoViewModel: InfoViewModel, activity: Activity) {
                     .padding(16.dp)
                     .verticalScroll(state = scrollState)
             ) {
+                Image(
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(300.dp)
+                        .align(alignment = Alignment.CenterHorizontally),
+                    painter = painterResource(
+                        id = R.drawable.truckillustration
+                    ),
+                    contentDescription = "truck illustration"
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
