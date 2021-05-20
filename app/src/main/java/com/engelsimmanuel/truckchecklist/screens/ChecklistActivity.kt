@@ -1542,7 +1542,7 @@ fun ChecklistScreen(infoViewModel: InfoViewModel, activity: Activity) {
                 }
                 Button(
                     modifier = Modifier
-                        .padding(top = 16.dp, bottom = 16.dp)
+                        .padding(top = 32.dp, bottom = 16.dp)
                         .fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(R.color.purple_500)),
                     onClick = {

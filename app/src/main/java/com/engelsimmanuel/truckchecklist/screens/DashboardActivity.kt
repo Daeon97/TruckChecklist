@@ -7,11 +7,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.engelsimmanuel.truckchecklist.R
 import com.engelsimmanuel.truckchecklist.database.utils.Info
@@ -37,6 +43,7 @@ class DashboardActivity : ComponentActivity() {
     private lateinit var infoViewModel: InfoViewModel
     private lateinit var infoList: ArrayList<Info>
 
+    @ExperimentalFoundationApi
     @ExperimentalMaterialApi
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,14 +56,9 @@ class DashboardActivity : ComponentActivity() {
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
         ).get(InfoViewModel::class.java)
-        infoViewModel.allInfo.observe(
-            this, {
-                infoList.addAll(it)
-                Log.wtf("info list", "info list is ${infoList.size}")
-            }
-        )
+
         setContent {
-            DashboardScreen(infoList = infoList, activity = this)
+            DashboardScreen(allInfo = infoViewModel.allInfo, activity = this)
         }
     }
 
@@ -75,9 +77,13 @@ fun DashboardScreenPreview() {
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
+fun DashboardScreen(
+    allInfo: LiveData<List<Info>>,
+    activity: Activity
+) {
     val scaffoldState = rememberScaffoldState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -89,6 +95,18 @@ fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
     val dropdownMenus = listOf("About", "Sign out")
     val dropdownIconIds = listOf(R.drawable.about, R.drawable.logout)
 
+    /*var infoList by remember {
+        mutableStateOf(ArrayList<Info>())
+    }
+    SideEffect {
+        infoViewModel.allInfo.observe(
+            activity as LifecycleOwner, {
+                infoList.addAll(it)
+                Log.wtf("info list", "info list in side effect is ${infoList.size}")
+            }
+        )
+    }*/
+
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetContent = {
@@ -97,7 +115,12 @@ fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            activity.startActivity(Intent(activity, ChecklistActivity::class.java))
+                            activity.startActivity(
+                                Intent(
+                                    activity,
+                                    ChecklistActivity::class.java
+                                )
+                            )
                             coroutineScope.launch {
                                 modalBottomSheetState.hide()
                             }
@@ -261,11 +284,23 @@ fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
                                 dropdownMenus.forEachIndexed { dropdownIndex, dropdownMenu ->
                                     DropdownMenuItem(onClick = {
                                         dropdownShown = !dropdownShown
-                                        if(dropdownIndex == 0){
-                                            //.
+                                        if (dropdownIndex == 0) {
+                                            coroutineScope.launch {
+                                                scaffoldState.snackbarHostState.showSnackbar(
+                                                    message = "Truck Checklist v1.0",
+                                                    actionLabel = "Dismiss",
+                                                    duration = SnackbarDuration.Indefinite
+                                                )
+                                            }
                                         } else {
-                                            SharedPrefsManager.getInstance(activity).isLoggedIn = false
-                                            activity.startActivity(Intent(activity, AuthActivity::class.java))
+                                            SharedPrefsManager.getInstance(activity).isLoggedIn =
+                                                false
+                                            activity.startActivity(
+                                                Intent(
+                                                    activity,
+                                                    AuthActivity::class.java
+                                                )
+                                            )
                                             activity.finish()
                                         }
                                     }) {
@@ -285,31 +320,112 @@ fun DashboardScreen(infoList: ArrayList<Info>, activity: Activity) {
                         }
                     }
                 }
-                if (infoList.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .width(300.dp)
-                                .height(300.dp)
-                                .align(alignment = Alignment.CenterHorizontally),
-                            painter = painterResource(
-                                id = R.drawable.checklistillustration
-                            ),
-                            contentDescription = "check list illustration"
-                        )
-                        Text(
-                            modifier = Modifier
-                                .align(alignment = Alignment.CenterHorizontally),
-                            text = "You have not made any checks yet",
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                /*if (allInfo.value == null) {
+                    Text("Null")
                 } else {
-                    Text("There are ${infoList.size} items here")
+                    if (allInfo.value!!.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .width(300.dp)
+                                    .height(300.dp)
+                                    .align(alignment = Alignment.CenterHorizontally),
+                                painter = painterResource(
+                                    id = R.drawable.checklistillustration
+                                ),
+                                contentDescription = "check list illustration"
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .align(alignment = Alignment.CenterHorizontally),
+                                text = "You have not made any checks yet",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {*/
+                LazyVerticalGrid(
+                    cells = GridCells.Fixed(2)
+                ) {
+                    items(3) { item ->
+                        Card(
+                            modifier = Modifier
+                                .padding(16.dp),
+                            shape = RoundedCornerShape(16),
+                            elevation = 16.dp
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.time),
+                                        contentDescription = "image of a clock"
+                                    )
+                                    Text(
+                                        text = "On Wed 20th april 2010",
+                                        modifier = Modifier
+                                            .padding(start = 8.dp),
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(top = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .height(100.dp),
+                                        painter = painterResource(id = R.drawable.vehiclesatfactoryillustration),
+                                        contentDescription = "vehicles at factory illustration",
+                                    )
+                                    Column(
+                                        modifier = Modifier.padding(start = 16.dp),
+                                        verticalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        Text(
+                                            "Registration number"
+                                        )
+                                        Text(
+                                            "Identification number"
+                                        )
+                                        Text(
+                                            "Model, year"
+                                        )
+                                    }
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.truckboy),
+                                        contentDescription = "truck boy icon"
+                                    )
+                                    Text(
+                                        "Truck boy",
+                                        modifier = Modifier
+                                            .padding(start = 8.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
+                //}
+                //}
             }
         }
     }
