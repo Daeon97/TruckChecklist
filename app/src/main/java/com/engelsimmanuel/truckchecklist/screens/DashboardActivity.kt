@@ -80,15 +80,14 @@ fun DashboardScreen(
     val infoList = infoViewModel.allInfo.observeAsState(listOf()).value
 
     val scaffoldState = rememberScaffoldState()
-    val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState =
         rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     var dropdownShown by remember {
         mutableStateOf(false)
     }
-    val dropdownMenus = listOf("About", "Sign out")
-    val dropdownIconIds = listOf(R.drawable.about, R.drawable.logout)
+    val dropdownMenus = listOf("About", "Clear database", "Sign out")
+    val dropdownIconIds = listOf(R.drawable.about, R.drawable.database, R.drawable.logout)
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
@@ -252,7 +251,7 @@ fun DashboardScreen(
                             ),
                             onClick = {
                                 dropdownShown = !dropdownShown
-                            }
+                            },
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.menu),
@@ -267,24 +266,30 @@ fun DashboardScreen(
                                 dropdownMenus.forEachIndexed { dropdownIndex, dropdownMenu ->
                                     DropdownMenuItem(onClick = {
                                         dropdownShown = !dropdownShown
-                                        if (dropdownIndex == 0) {
-                                            coroutineScope.launch {
-                                                scaffoldState.snackbarHostState.showSnackbar(
-                                                    message = "Truck Checklist v1.0",
-                                                    actionLabel = "Dismiss",
-                                                    duration = SnackbarDuration.Indefinite
-                                                )
+                                        when (dropdownIndex) {
+                                            0 -> {
+                                                coroutineScope.launch {
+                                                    scaffoldState.snackbarHostState.showSnackbar(
+                                                        message = "Truck Checklist v1.0",
+                                                        actionLabel = "Dismiss",
+                                                        duration = SnackbarDuration.Indefinite
+                                                    )
+                                                }
                                             }
-                                        } else {
-                                            SharedPrefsManager.getInstance(activity).isLoggedIn =
-                                                false
-                                            activity.startActivity(
-                                                Intent(
-                                                    activity,
-                                                    AuthActivity::class.java
+                                            1 -> {
+                                                infoViewModel.deleteAllInfo()
+                                            }
+                                            else -> {
+                                                SharedPrefsManager.getInstance(activity).isLoggedIn =
+                                                    false
+                                                activity.startActivity(
+                                                    Intent(
+                                                        activity,
+                                                        AuthActivity::class.java
+                                                    )
                                                 )
-                                            )
-                                            activity.finish()
+                                                activity.finish()
+                                            }
                                         }
                                     }) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -412,5 +417,10 @@ fun DashboardScreen(
 
 private fun showDateAndTime(timestamp: String): String {
     val actualTimestamp = Timestamp.valueOf(timestamp)
-    return "On ${DateFormat.format("E dd MMMM yyyy", actualTimestamp.time)} at ${DateFormat.format("hh:mm:ss", actualTimestamp.time)}"
+    return "On ${
+        DateFormat.format(
+            "E dd MMMM yyyy",
+            actualTimestamp.time
+        )
+    } at ${DateFormat.format("hh:mm:ss", actualTimestamp.time)}"
 }
