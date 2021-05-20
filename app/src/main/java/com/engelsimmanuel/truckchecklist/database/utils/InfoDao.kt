@@ -1,31 +1,23 @@
-package com.engelsimmanuel.truckchecklist.database.utils;
+package com.engelsimmanuel.truckchecklist.database.utils
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.*
 
 // DAO class to provide methods that the rest of the app uses to interact with data
 @Dao
-public interface InfoDao {
-
+interface InfoDao {
     @Insert
-    void insert(Info info);
+    suspend fun insert(info: Info?)
 
     @Update
-    void update(Info info);
+    suspend fun update(info: Info?)
 
     @Delete
-    void delete(Info info);
+    suspend fun delete(info: Info?)
 
     @Query("DELETE FROM info_table")
-    void deleteAllInfo();
+    suspend fun deleteAllInfo()
 
     @Query("SELECT * FROM info_table ORDER BY uid DESC")
-    LiveData<List<Info>> getAllInfo();
-
+    fun allInfo(): LiveData<List<Info>>
 }

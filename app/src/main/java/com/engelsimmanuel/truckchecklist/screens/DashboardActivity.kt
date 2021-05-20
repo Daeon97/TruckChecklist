@@ -1,9 +1,10 @@
 package com.engelsimmanuel.truckchecklist.screens
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.text.format.DateFormat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -12,36 +13,34 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.engelsimmanuel.truckchecklist.R
-import com.engelsimmanuel.truckchecklist.database.utils.Info
 import com.engelsimmanuel.truckchecklist.mvvm.arch.InfoViewModel
+import com.engelsimmanuel.truckchecklist.mvvm.arch.InfoViewModelFactory
 import com.engelsimmanuel.truckchecklist.sharedprefs.SharedPrefsManager
 import com.engelsimmanuel.truckchecklist.ui.theme.TruckChecklistTheme
 import kotlinx.coroutines.launch
+import java.sql.Timestamp
+import java.util.*
 
 class DashboardActivity : ComponentActivity() {
-    private lateinit var infoViewModel: InfoViewModel
-    private lateinit var infoList: ArrayList<Info>
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -49,16 +48,8 @@ class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        infoViewModel = InfoViewModel(application)
-        infoList = arrayListOf()
-
-        infoViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        ).get(InfoViewModel::class.java)
-
         setContent {
-            DashboardScreen(allInfo = infoViewModel.allInfo, activity = this)
+            DashboardScreen(activity = this)
         }
     }
 
@@ -81,9 +72,13 @@ fun DashboardScreenPreview() {
 @ExperimentalMaterialApi
 @Composable
 fun DashboardScreen(
-    allInfo: LiveData<List<Info>>,
     activity: Activity
 ) {
+    val context = LocalContext.current
+    val infoViewModel: InfoViewModel =
+        viewModel(factory = InfoViewModelFactory(context.applicationContext as Application))
+    val infoList = infoViewModel.allInfo.observeAsState(listOf()).value
+
     val scaffoldState = rememberScaffoldState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -94,18 +89,6 @@ fun DashboardScreen(
     }
     val dropdownMenus = listOf("About", "Sign out")
     val dropdownIconIds = listOf(R.drawable.about, R.drawable.logout)
-
-    /*var infoList by remember {
-        mutableStateOf(ArrayList<Info>())
-    }
-    SideEffect {
-        infoViewModel.allInfo.observe(
-            activity as LifecycleOwner, {
-                infoList.addAll(it)
-                Log.wtf("info list", "info list in side effect is ${infoList.size}")
-            }
-        )
-    }*/
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
@@ -320,113 +303,114 @@ fun DashboardScreen(
                         }
                     }
                 }
-                /*if (allInfo.value == null) {
-                    Text("Null")
-                } else {
-                    if (allInfo.value!!.isEmpty()) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .width(300.dp)
-                                    .height(300.dp)
-                                    .align(alignment = Alignment.CenterHorizontally),
-                                painter = painterResource(
-                                    id = R.drawable.checklistillustration
-                                ),
-                                contentDescription = "check list illustration"
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(alignment = Alignment.CenterHorizontally),
-                                text = "You have not made any checks yet",
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    } else {*/
-                LazyVerticalGrid(
-                    cells = GridCells.Fixed(2)
-                ) {
-                    items(3) { item ->
-                        Card(
+                if (infoList.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
                             modifier = Modifier
-                                .padding(16.dp),
-                            shape = RoundedCornerShape(16),
-                            elevation = 16.dp
-                        ) {
-                            Column(
+                                .width(300.dp)
+                                .height(300.dp)
+                                .align(alignment = Alignment.CenterHorizontally),
+                            painter = painterResource(
+                                id = R.drawable.checklistillustration
+                            ),
+                            contentDescription = "check list illustration"
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(alignment = Alignment.CenterHorizontally),
+                            text = "You have not made any checks yet",
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        cells = GridCells.Fixed(2)
+                    ) {
+                        items(infoList) { info ->
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxSize()
                                     .padding(16.dp),
+                                shape = RoundedCornerShape(16),
+                                elevation = 16.dp
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.time),
-                                        contentDescription = "image of a clock"
-                                    )
-                                    Text(
-                                        text = "On Wed 20th april 2010",
-                                        modifier = Modifier
-                                            .padding(start = 8.dp),
-                                    )
-                                }
-                                Row(
+                                Column(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .padding(top = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
+                                        .padding(16.dp),
                                 ) {
-                                    Image(
+                                    Row(
                                         modifier = Modifier
-                                            .width(100.dp)
-                                            .height(100.dp),
-                                        painter = painterResource(id = R.drawable.vehiclesatfactoryillustration),
-                                        contentDescription = "vehicles at factory illustration",
-                                    )
-                                    Column(
-                                        modifier = Modifier.padding(start = 16.dp),
-                                        verticalArrangement = Arrangement.SpaceEvenly
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Text(
-                                            "Registration number"
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.time),
+                                            contentDescription = "image of a clock"
                                         )
                                         Text(
-                                            "Identification number"
-                                        )
-                                        Text(
-                                            "Model, year"
+                                            text = showDateAndTime(info.timestamp),
+                                            modifier = Modifier
+                                                .padding(start = 8.dp),
                                         )
                                     }
-                                }
-                                Row(
-                                    modifier = Modifier
-                                        .padding(top = 8.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.truckboy),
-                                        contentDescription = "truck boy icon"
-                                    )
-                                    Text(
-                                        "Truck boy",
+                                    Row(
                                         modifier = Modifier
-                                            .padding(start = 8.dp),
-                                    )
+                                            .fillMaxSize()
+                                            .padding(top = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(100.dp),
+                                            painter = painterResource(id = R.drawable.vehiclesatfactoryillustration),
+                                            contentDescription = "vehicles at factory illustration",
+                                        )
+                                        Column(
+                                            modifier = Modifier.padding(start = 16.dp),
+                                            verticalArrangement = Arrangement.SpaceEvenly
+                                        ) {
+                                            Text(
+                                                "Reg no. ${info.registrationNumber}"
+                                            )
+                                            Text(
+                                                info.identificationNumber
+                                            )
+                                            Text(
+                                                "Model ${info.model}, ${info.year}"
+                                            )
+                                        }
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(top = 8.dp)
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.truckboy),
+                                            contentDescription = "truck boy icon"
+                                        )
+                                        Text(
+                                            info.truckBoy,
+                                            modifier = Modifier
+                                                .padding(start = 8.dp),
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                //}
-                //}
             }
         }
     }
+}
+
+private fun showDateAndTime(timestamp: String): String {
+    val actualTimestamp = Timestamp.valueOf(timestamp)
+    return "On ${DateFormat.format("E dd MMMM yyyy", actualTimestamp.time)} at ${DateFormat.format("hh:mm:ss", actualTimestamp.time)}"
 }

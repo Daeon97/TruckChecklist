@@ -1,42 +1,55 @@
-package com.engelsimmanuel.truckchecklist.mvvm.arch;
+package com.engelsimmanuel.truckchecklist.mvvm.arch
 
-import android.app.Application;
+import android.app.Application
+import androidx.lifecycle.*
+import com.engelsimmanuel.truckchecklist.database.utils.Info
+import com.engelsimmanuel.truckchecklist.database.utils.InfoDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
+class InfoViewModel(application: Application) : AndroidViewModel(application) {
 
-import com.engelsimmanuel.truckchecklist.database.utils.Info;
+    val allInfo: LiveData<List<Info>>
+    private val infoRepository: InfoRepository
 
-import java.util.List;
-
-public class InfoViewModel extends AndroidViewModel {
-    private InfoRepository infoRepository;
-    private LiveData<List<Info>> allInfo;
-
-    public InfoViewModel(@NonNull Application application) {
-        super(application);
-        infoRepository = new InfoRepository(application);
-        allInfo = infoRepository.getAllInfo();
+    init {
+        val infoDao = InfoDatabase.getInstance(application).infoDao()
+        infoRepository = InfoRepository(infoDao)
+        allInfo = infoRepository.allInfo
     }
 
-    public void insert(Info info) {
-        infoRepository.insert(info);
+    fun insert(info: Info?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            infoRepository.insert(info)
+        }
     }
 
-    public void update(Info info) {
-        infoRepository.update(info);
+    fun update(info: Info?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            infoRepository.update(info)
+        }
     }
 
-    public void delete(Info info) {
-        infoRepository.delete(info);
+    fun delete(info: Info?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            infoRepository.delete(info)
+        }
     }
 
-    public void deleteAllInfo() {
-        infoRepository.deleteAllInfo();
+    fun deleteAllInfo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            infoRepository.deleteAllInfo()
+        }
     }
+}
 
-    public LiveData<List<Info>> getAllInfo() {
-        return allInfo;
+class InfoViewModelFactory(
+    private val application: Application
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(InfoViewModel::class.java)) {
+            return InfoViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
