@@ -12,7 +12,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -75,8 +75,7 @@ fun DashboardScreen(
     activity: Activity
 ) {
     val context = LocalContext.current
-    val infoViewModel: InfoViewModel =
-        viewModel(factory = InfoViewModelFactory(context.applicationContext as Application))
+    val infoViewModel: InfoViewModel = viewModel(factory = InfoViewModelFactory(context.applicationContext as Application))
     val infoList = infoViewModel.allInfo.observeAsState(listOf()).value
 
     val scaffoldState = rememberScaffoldState()
@@ -277,7 +276,14 @@ fun DashboardScreen(
                                                 }
                                             }
                                             1 -> {
-                                                infoViewModel.deleteAllInfo()
+                                                when (infoList.isEmpty()) {
+                                                    true -> coroutineScope.launch {
+                                                        scaffoldState.snackbarHostState.showSnackbar(
+                                                            message = "Database is already empty. There is nothing to clear"
+                                                        )
+                                                    }
+                                                    false -> infoViewModel.deleteAllInfo()
+                                                }
                                             }
                                             else -> {
                                                 SharedPrefsManager.getInstance(activity).isLoggedIn =
@@ -334,12 +340,12 @@ fun DashboardScreen(
                     LazyVerticalGrid(
                         cells = GridCells.Fixed(2)
                     ) {
-                        items(infoList) { info ->
+                        itemsIndexed(infoList) { _, info ->
                             Card(
                                 modifier = Modifier
-                                    .padding(16.dp),
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 20.dp),
                                 shape = RoundedCornerShape(16),
-                                elevation = 16.dp
+                                elevation = 8.dp
                             ) {
                                 Column(
                                     modifier = Modifier
